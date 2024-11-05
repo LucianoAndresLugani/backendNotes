@@ -1,44 +1,48 @@
-
 const mongoose = require('mongoose');
+
+// Si tienes problemas con el puerto o el usuario, revisa bien la URI de conexión
 const uri = "mongodb+srv://luciano:1816@cluster0.4mjsf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+mongoose.set('strictQuery', false);
+
+// Definir el esquema y el modelo en la parte superior para evitar duplicidad
+const noteSchema = new mongoose.Schema({
+  content: String,
+  date: { type: Date, default: Date.now },
+  important: Boolean,
+});
+
+const Note = mongoose.model('Note', noteSchema);
 
 async function run() {
   try {
-    // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
-    await mongoose.connect(uri, clientOptions);
-    await mongoose.connection.db.admin().command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    mongoose.set('strictQuery',false)
-    const noteSchema = new mongoose.Schema({
-        content: String,
-        important: Boolean,
-      })
-      
-      const Note = mongoose.model('Note', noteSchema)
-      
-      const note = new Note({
-        content: 'HTML is x',
-        important: true,
-      })
-      
-      /*
-      note.save().then(result => {
-        console.log('note saved!')
-        mongoose.connection.close()
-      })
-      */
-      Note.find({}).then(result => {
-        result.forEach(note => {
-          console.log(note)
-        })
-        mongoose.connection.close()
-    })
-  
-} finally {
-    // Ensures that the client will close when you finish/error
-    await mongoose.disconnect();
+    // Conectar a la base de datos
+    await mongoose.connect(uri, { serverApi: { version: '1', strict: true, deprecationErrors: true } });
+    console.log("Conectado a MongoDB correctamente.");
+
+    // Guardar una nueva nota (descomentar si deseas guardarla)
+    /*
+    const note = new Note({
+      content: 'Mongoose makes things easy',
+      important: true,
+    });
+
+    await note.save();
+    console.log('Nota guardada:', note);
+    */
+
+    // Encontrar y mostrar todas las notas
+    const notes = await Note.find({});
+    notes.forEach(note => console.log(note));
+
+  } catch (error) {
+    console.error("Error al conectar con MongoDB:", error);
+  } finally {
+    // Cerrar la conexión
+    await mongoose.connection.close();
+    console.log("Conexión cerrada.");
   }
 }
+
+// Ejecutar la función
 run().catch(console.dir);
