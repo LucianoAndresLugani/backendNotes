@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 // Si tienes problemas con el puerto o el usuario, revisa bien la URI de conexión
 
-const url = "mongodb+srv://luciano:1816@cluster0.4mjsf.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0";
+const url='mongodb+srv://luciano:1816@cluster0.4mjsf.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0'
 
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
